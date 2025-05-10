@@ -16,15 +16,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
         echo "<script>alert('Erro ao excluir o produto.');</script>";
     }
     // Redirecionar para a mesma página
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Location: " . $_SERVER['PHP_SELF']); // Evitar reenvio do formulário
+if ($stmt->execute()) {
+    echo "<script>alert('Produto cadastrado com sucesso!');</script>";
+    header("Location: " . $_SERVER['PHP_SELF']); // Redireciona para evitar reenvio
+    exit;
+} else {
+    echo "<script>alert('Erro ao cadastrar o produto.');</script>";
+}
     exit;
 }
-
 // CADASTRO E EDIÇÃO
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = isset($_POST['id']) ? (int) $_POST['id'] : null;
-    $categoria = isset($_POST['categoria']) ? $_POST['categoria'] : null;
-    $produto = isset($_POST['produto']) ? $_POST['produto'] : null;
+    $categoria = isset($_POST['categoria']) ? strtoupper($_POST['categoria']) : null; // Maiúsculas
+    $produto = isset($_POST['produto']) ? strtoupper($_POST['produto']) : null; // Maiúsculas
     $quantidade = isset($_POST['quantidade']) ? (int) $_POST['quantidade'] : null;
     $valor_unitario = isset($_POST['valor_unitario']) ? (float) $_POST['valor_unitario'] : null;
 
@@ -38,9 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql = "UPDATE PRODUTOS SET CATEGORIA = ?, PRODUTO = ?, QUANTIDADE = ?, VALOR_UNITARIO = ?, VALOR_TOTAL = ? WHERE ID = ?";
             $stmt = $con->prepare($sql);
             $stmt->bind_param("ssiddi", $categoria, $produto, $quantidade, $valor_unitario, $valor_total, $id);
-
             if ($stmt->execute()) {
                 echo "<script>alert('Produto atualizado com sucesso!');</script>";
+                header("Location: " . $_SERVER['PHP_SELF']); // Redireciona para evitar reenvio
+                exit;
             } else {
                 echo "<script>alert('Erro ao atualizar o produto.');</script>";
             }
@@ -62,9 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql = "INSERT INTO PRODUTOS (CATEGORIA, PRODUTO, QUANTIDADE, VALOR_UNITARIO, VALOR_TOTAL, FOTO) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $con->prepare($sql);
             $stmt->bind_param("ssidds", $categoria, $produto, $quantidade, $valor_unitario, $valor_total, $fotoDestino);
-
             if ($stmt->execute()) {
                 echo "<script>alert('Produto cadastrado com sucesso!');</script>";
+                header("Location: " . $_SERVER['PHP_SELF']); // Redireciona para evitar reenvio
+                exit;
             } else {
                 echo "<script>alert('Erro ao cadastrar o produto.');</script>";
             }
@@ -144,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    text-transform: uppercase; /* Transforma o texto em maiúsculas */
 }
 
 #form-container button {
@@ -181,6 +190,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Formulário para cadastro -->
     <div id="form-container" class="form-container">
     <form action="" method="POST" enctype="multipart/form-data">
+        <input type="hidden" id="id" name="id">
+        
         <label for="foto">Foto:</label>
         <input type="file" id="foto" name="foto" accept="image/*">
 
