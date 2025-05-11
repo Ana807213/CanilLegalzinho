@@ -59,11 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $fotoNome = basename($_FILES['foto']['name']);
                 $fotoDestino = "uploads/" . $fotoNome;
 
-                if (!is_dir("uploads")) {
-                    mkdir("uploads", 0777, true);
-                }
+                if (!is_dir("admin/uploads")) {
+                mkdir("admin/uploads", 0777, true);
+}
 
                 move_uploaded_file($fotoTmp, $fotoDestino);
+                if (move_uploaded_file($fotoTmp, $fotoDestino)) {
+                echo "Imagem salva em: " . $fotoDestino;  // Debug
+                } else {
+                    echo "<script>alert('Erro ao mover a imagem.');</script>";
+                }
             }
 
             $sql = "INSERT INTO PRODUTOS (CATEGORIA, PRODUTO, QUANTIDADE, VALOR_UNITARIO, VALOR_TOTAL, FOTO) VALUES (?, ?, ?, ?, ?, ?)";
@@ -185,6 +190,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </style>
 </head>
 <body>
+    <body>
+
+<!-- 🟣 MENU DE NAVEGAÇÃO -->
+<div style="background-color: #c2185b; padding: 10px;">
+  <a href="index.php" style="color: white; margin-right: 20px; text-decoration: none;">📋 Cadastro de Categorias</a>
+  <a href="vendas.php" style="color: white; text-decoration: none;">💰 Relatório de Vendas</a>
+</div>
+
+<!-- FORMULÁRIO DE CADASTRO EXISTENTE ABAIXO -->
+<h1>Bem vindo, Admin !</h1>
+<form method="POST" enctype="multipart/form-data" action="salvar.php">
+  <!-- campos do formulário -->
+</form>
     <h1>Cadastro de Categorias</h1>
 
     <!-- Formulário para cadastro -->
@@ -235,7 +253,7 @@ $result = $con->query($sql);
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         echo "<tr>
-            <td><img src='../{$row['FOTO']}' alt='Foto do Produto' width='100' height='100'></td>
+            <td><img src='{$row['FOTO']}' alt='Foto do Produto'>
             <td>{$row['CATEGORIA']}</td>
             <td>{$row['PRODUTO']}</td>
             <td>{$row['QUANTIDADE']}</td>

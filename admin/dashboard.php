@@ -9,18 +9,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $valor_total = $quantidade * $valor_unitario;
 
     // Verificar se o arquivo foi enviado
-    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-        $fotoTmp = $_FILES['foto']['tmp_name'];
-        $fotoNome = basename($_FILES['foto']['name']);
-        $fotoDestino = "uploads/" . $fotoNome;
+if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+    $fotoTmp = $_FILES['foto']['tmp_name'];
+    $fotoNome = basename($_FILES['foto']['name']);
+    $fotoDestino = "uploads/" . $fotoNome; // <-- Corrigido
 
-        // Criar o diretório de uploads, se não existir
-        if (!is_dir("uploads")) {
-            mkdir("uploads", 0777, true);
-        }
+    // ✅ Criar o diretório de uploads, se não existir
+    if (!is_dir("uploads")) {
+        mkdir("uploads", 0777, true);
+    }
 
-        // Mover o arquivo para o diretório de destino
-        if (move_uploaded_file($fotoTmp, $fotoDestino)) {
+    // Mover o arquivo para o diretório de destino
+    if (move_uploaded_file($fotoTmp, $fotoDestino)) {
+       
+        // Verificar se o arquivo foi movido com sucesso
             // Preparar a query
             $sql = "INSERT INTO PRODUTOS (CATEGORIA, PRODUTO, QUANTIDADE, VALOR_UNITARIO, VALOR_TOTAL, FOTO) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $con->prepare($sql);
